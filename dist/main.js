@@ -22793,8 +22793,9 @@ const fragment = function(...children) {
 function tabulate(lcov, options) {
 	const head = tr(
 		th("File"),
+		th("Statements"),
 		th("Branches"),
-		th("Funcs"),
+		th("Functions"),
 		th("Lines"),
 		th("Uncovered Lines"),
 	);
@@ -22829,9 +22830,21 @@ function toFolder(path) {
 	return tr(td({ colspan: 5 }, b(path)))
 }
 
+function getStatement(file) {
+	const { branches, functions, lines } = file;
+	return [branches, functions, lines].reduce((prev, curr) => ({
+		hit: prev.hit + (curr.hit || 0),
+		found: prev.found + (curr.found || 0),
+	}), {
+		hit: 0,
+		found: 0,
+	})
+}
+
 function toRow(file, indent, options) {
 	return tr(
 		td(filename(file, indent, options)),
+		td(percentage$1(getStatement(file))),
 		td(percentage$1(file.branches)),
 		td(percentage$1(file.functions)),
 		td(percentage$1(file.lines)),
